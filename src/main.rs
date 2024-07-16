@@ -1,3 +1,4 @@
+use minigrep::Config;
 /**
  * 引入标准库中的 env 模块，这个模块提供了与环境相关的功能，包括但不限于读取环境变量和命令行参数。
  * std::env 模块包含了以下几个主要功能：
@@ -15,34 +16,24 @@
  *      temp_dir()：返回系统临时目录的路径。
  */
 use std::env;
-/**
- * 导入标准库中的 fs 模块，这个模块提供了文件系统相关的功能，允许你执行诸如创建、打开、读取、写入、删除和移动文件等操作。
- * fs 模块中的一些常用功能包括：
- *      create_dir(path: &Path): 创建一个目录。
- *      create_dir_all(path: &Path): 创建一个目录及所有父目录。
- *      remove_dir(path: &Path): 删除一个空目录。
- *      remove_dir_all(path: &Path): 删除一个目录及其所有子目录和文件。
- *      remove_file(path: &Path): 删除一个文件。
- *      rename(from: &Path, to: &Path): 重命名或移动一个文件或目录。
- *      copy(from: &Path, to: &Path): 复制一个文件。
- *      read_to_string(path: &Path) -> io::Result<String>: 将文件内容读取为字符串。
- *      write(path: &Path, data: &[u8]) -> io::Result<usize>: 将数据写入文件。
- *
- */
-use std::fs;
+use std::process;
 fn main() {
     // 调用了 std::env 模块中的 args 函数，它返回一个迭代器，其中包含了所有从命令行传递给程序的参数
     // .collect() 是一个迭代器方法，用于将迭代器中的元素收集到一个集合中。
     let args: Vec<String> = env::args().collect();
     // dbg! 是一个宏，通常用于调试目的。它接受一个表达式作为参数，并打印出该表达式的值以及其类型。这在调试时非常有用，因为它不仅显示了变量的值，还显示了变量的数据类型
     // dbg!(args);
-    let query = &args[1];
-    let file_path = &args[2];
-    println!("Searching for {} ", query);
-    println!("In file {} ", file_path);
-    // read_to_string 函数尝试读取文件的全部内容，并将内容转换为一个 String 类型的字符串
-    // expect 是一个宏，用于处理 Result 类型的值。在这里，read_to_string 返回的 Result 要么包含一个 Ok(String) 成功情况，要么包含一个 Err(io::Error) 失败情况。
-    // 如果函数成功读取了文件，expect 将返回 Ok 中的 String；但如果读取失败，expect 将触发一个 panic!
-    let contents = fs::read_to_string(file_path).expect("Should have been able to read the file");
-    println!("With text:\n{}", contents);
+    // 对 build 返回的 `Result` 进行处理
+    // unwrap_or_else 是定义在 Result<T,E> 上的常用方法，如果 Result 是 Ok，那该方法就类似 unwrap：返回 Ok 内部的值；如果是 Err，就调用闭包中的自定义代码对错误进行进一步处理
+    let config = Config::build(&args).unwrap_or_else(|err| {
+        println!("problem parsing arguments: {err}");
+        process::exit(1);
+    });
+    println!("Searching for {} ", config.query);
+    println!("In file {} ", config.file_path);
+
+    if let Err(e) = minigrep::run(config) {
+        println!("Application error: {e}");
+        process::exit(1);
+    }
 }
