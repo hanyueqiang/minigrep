@@ -1,4 +1,18 @@
 use std::error::Error;
+/**
+ * 导入标准库中的 fs 模块，这个模块提供了文件系统相关的功能，允许你执行诸如创建、打开、读取、写入、删除和移动文件等操作。
+ * fs 模块中的一些常用功能包括：
+ *      create_dir(path: &Path): 创建一个目录。
+ *      create_dir_all(path: &Path): 创建一个目录及所有父目录。
+ *      remove_dir(path: &Path): 删除一个空目录。
+ *      remove_dir_all(path: &Path): 删除一个目录及其所有子目录和文件。
+ *      remove_file(path: &Path): 删除一个文件。
+ *      rename(from: &Path, to: &Path): 重命名或移动一个文件或目录。
+ *      copy(from: &Path, to: &Path): 复制一个文件。
+ *      read_to_string(path: &Path) -> io::Result<String>: 将文件内容读取为字符串。
+ *      write(path: &Path, data: &[u8]) -> io::Result<usize>: 将数据写入文件。
+ *
+ */
 use std::fs;
 
 pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
