@@ -20,20 +20,20 @@ use std::process;
 fn main() {
     // 调用了 std::env 模块中的 args 函数，它返回一个迭代器，其中包含了所有从命令行传递给程序的参数
     // .collect() 是一个迭代器方法，用于将迭代器中的元素收集到一个集合中。
-    let args: Vec<String> = env::args().collect();
+    // let args: Vec<String> = env::args().collect();
     // dbg! 是一个宏，通常用于调试目的。它接受一个表达式作为参数，并打印出该表达式的值以及其类型。这在调试时非常有用，因为它不仅显示了变量的值，还显示了变量的数据类型
     // dbg!(args);
     // 对 build 返回的 `Result` 进行处理
     // unwrap_or_else 是定义在 Result<T,E> 上的常用方法，如果 Result 是 Ok，那该方法就类似 unwrap：返回 Ok 内部的值；如果是 Err，就调用闭包中的自定义代码对错误进行进一步处理
-    let config = Config::build(&args).unwrap_or_else(|err| {
-        println!("problem parsing arguments: {err}");
+    let config = Config::build(env::args()).unwrap_or_else(|err| {
+        eprintln!("problem parsing arguments: {err}");
         process::exit(1);
     });
     println!("Searching for {} ", config.query);
     println!("In file {} ", config.file_path);
 
     if let Err(e) = minigrep::run(config) {
-        println!("Application error: {e}");
+        eprintln!("Application error: {e}");
         process::exit(1);
     }
 }
